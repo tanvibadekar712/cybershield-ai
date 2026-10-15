@@ -1,54 +1,137 @@
 {% extends "base.html" %}
-{% block title %}Analyzer · CyberShield AI{% endblock %}
+{% block title %}Threat Analyzer — CyberShield AI{% endblock %}
 {% block content %}
-<section class="section narrow">
-  <h2>Comment Analyzer</h2>
-  <div class="card">
-    <textarea id="text" maxlength="1000" placeholder="Type or paste a comment to analyze..."></textarea>
-    <div class="row">
-      <div class="chips">
-        <button class="chip" data-t="You are so stupid and worthless, nobody likes you">Toxic</button>
-        <button class="chip" data-t="I will find you and hurt you after school">Threat</button>
-        <button class="chip" data-t="I disagree with you, but thanks for sharing your view">Safe</button>
+<section class="section workbench-section">
+  <div class="workbench-header">
+    <div class="sub-badge">Real-Time Threat Console</div>
+    <h1 class="page-title">Comment &amp; Message Toxicity Analyzer</h1>
+    <p class="page-subtitle">Paste any user comment, message, or social media snippet to inspect toxicity probabilities across 6 distinct risk categories, isolate harmful keywords, and generate constructive alternatives.</p>
+  </div>
+
+  <!-- INPUT CONSOLE CARD -->
+  <div class="card workbench-card">
+    <div class="workbench-toolbar">
+      <div class="toolbar-left">
+        <span class="toolbar-label">INPUT STREAM</span>
       </div>
-      <span id="counter" class="muted">0 / 1000</span>
+      <div class="toolbar-right">
+        <span id="counter" class="char-counter">0 / 1000 characters</span>
+      </div>
     </div>
-    <div class="row">
-      <button id="analyzeBtn" class="btn primary">Analyze</button>
-      <button id="clearBtn" class="btn ghost">Clear</button>
+
+    <div class="textarea-wrap">
+      <textarea id="text" maxlength="1000" placeholder="Type or paste any message, comment, or forum post to analyze (e.g., 'You are so stupid and worthless, nobody likes you')..."></textarea>
+    </div>
+
+    <div class="sample-chips-row">
+      <span class="chips-title">Quick Presets:</span>
+      <div class="chips">
+        <button class="chip" data-t="You are so stupid and worthless, nobody likes you">🔥 Severe Insult</button>
+        <button class="chip" data-t="I will find you and hurt you after school">⚠️ Physical Threat</button>
+        <button class="chip" data-t="You people are disgusting and should go back where you came from">🚫 Identity Hate</button>
+        <button class="chip" data-t="What the hell is this damn bullshit garbage">🗯️ Vulgarity</button>
+        <button class="chip" data-t="I disagree with your point, but I respect your perspective and effort">✅ Civil Debate</button>
+      </div>
+    </div>
+
+    <div class="workbench-actions">
+      <div class="actions-left">
+        <button id="clearBtn" class="btn btn-ghost btn-sm">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          Clear
+        </button>
+      </div>
+      <div class="actions-right">
+        <span class="hotkey-tip">Press <b>Ctrl + Enter</b> to scan</span>
+        <button id="analyzeBtn" class="btn btn-primary btn-md">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          Run Threat Scan
+        </button>
+      </div>
     </div>
   </div>
 
-  <div id="result" class="hidden">
-    <div class="grid2">
-      <div class="card center">
-        <div id="gauge" class="gauge"><div class="gauge-in"><b id="gaugeVal">0%</b><small>toxicity</small></div></div>
+  <!-- DIAGNOSTIC RESULTS SECTION -->
+  <div id="result" class="diagnostic-result hidden">
+    <!-- Top Diagnostics: Gauge & Categories -->
+    <div class="grid2 result-overview-grid">
+      <!-- Left: Overall Score Card -->
+      <div class="card center result-card">
+        <span class="card-eyebrow">PRIMARY RISK INDEX</span>
+        <div id="gauge" class="gauge">
+          <div class="gauge-in">
+            <b id="gaugeVal">0%</b>
+            <small>Toxicity Index</small>
+          </div>
+        </div>
         <div id="verdict" class="verdict"></div>
         <div id="severity" class="sev"></div>
-        <div id="tags" class="chips"></div>
+        <div id="tags" class="chips tags-chips"></div>
       </div>
-      <div class="card">
-        <h3>Category Scores</h3>
-        <div id="bars"></div>
+
+      <!-- Right: Multi-Category Breakdown -->
+      <div class="card result-card">
+        <div class="card-head-row">
+          <span class="card-eyebrow">RISK DIMENSIONS BREAKDOWN</span>
+          <span class="model-badge">Sigmoid Probabilities</span>
+        </div>
+        <div id="bars" class="bars-container"></div>
       </div>
     </div>
 
-    <div class="card">
-      <h3>Why was this flagged?</h3>
-      <p id="highlighted" class="hl"></p>
-      <p id="explanation" class="muted"></p>
-    </div>
-
-    <div class="card safe-card">
-      <h3>✨ Safer Rewrite</h3>
-      <p id="rewrite" class="rewrite"></p>
-      <div class="row">
-        <button id="copyBtn" class="btn ghost">Copy</button>
-        <button id="useBtn" class="btn primary">Use this version</button>
+    <!-- Middle: Explainable AI Attribution -->
+    <div class="card xai-card">
+      <div class="card-head-row">
+        <div>
+          <span class="card-eyebrow">EXPLAINABILITY LENS (XAI)</span>
+          <h3>Why was this message flagged?</h3>
+        </div>
+        <span class="pill-info">Token-Level Weight Attribution</span>
+      </div>
+      <p id="highlighted" class="hl-content"></p>
+      <div class="explanation-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <p id="explanation" class="explanation-text"></p>
       </div>
     </div>
-    <p id="disclaimer" class="note"></p>
+
+    <!-- Bottom: Generative De-escalation Alternative -->
+    <div class="card safe-card-elevated">
+      <div class="card-head-row">
+        <div>
+          <span class="safe-eyebrow">AI HARMONIC DE-ESCALATION</span>
+          <h3>✨ Constructive Alternative</h3>
+        </div>
+        <span class="pill-success">Non-Violent Synthesis</span>
+      </div>
+      <p id="rewrite" class="rewrite-content"></p>
+      <div class="safe-actions-row">
+        <button id="copyBtn" class="btn btn-ghost btn-sm">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          Copy Alternative
+        </button>
+        <button id="useBtn" class="btn btn-primary btn-sm">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+          Adopt into Input Box
+        </button>
+      </div>
+    </div>
+
+    <!-- Model Disclaimer -->
+    <p id="disclaimer" class="note disclaimer-note"></p>
   </div>
 </section>
 {% endblock %}
-{% block scripts %}<script src="{{ url_for('static', filename='js/analyzer.js') }}"></script>{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/analyzer.js') }}"></script>
+<script>
+// Hotkey Ctrl + Enter to submit
+document.getElementById('text').addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    document.getElementById('analyzeBtn').click();
+  }
+});
+</script>
+{% endblock %}

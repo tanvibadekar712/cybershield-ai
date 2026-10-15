@@ -126,5 +126,45 @@
     "severity": "none",
     "score": 0.019,
     "time": "2026-10-11 16:15:43"
+  },
+  {
+    "id": "288c3c4f",
+    "text": "Have a wonderful day!",
+    "label": "safe",
+    "severity": "none",
+    "score": 0.028,
+    "time": "2026-10-15 22:09:52"
+  },
+  {
+    "id": "2b91920a",
+    "text": "hi i am agnesh beldar",
+    "label": "safe",
+    "severity": "none",
+    "score": 0.126,
+    "time": "2026-10-15 23:54:00"
+  },
+  {
+    "id": "a1f5b955",
+    "text": "i am hcker",
+    "label": "safe",
+    "severity": "none",
+    "score": 0.2,
+    "time": "2026-10-15 23:54:17"
+  },
+  {
+    "id": "3d80237e",
+    "text": "i ghack the sysytem",
+    "label": "safe",
+    "severity": "none",
+    "score": 0.01,
+    "time": "2026-10-15 23:54:29"
+  },
+  {
+    "id": "e2a73954",
+    "text": "i hack the system",
+    "label": "safe",
+    "severity": "none",
+    "score": 0.03,
+    "time": "2026-10-15 23:54:43"
   }
 ]
